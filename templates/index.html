@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subnet Master IPv4 Pro | Universal Subnetting Engine</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    gold: {
+                        400: '#D56082',
+                        500: '#A7325D',
+                        600: '#7E2245',
+                        glow: '#FF75A0'
+                    },
+                    cyber: {
+                        dark: '#070A12',
+                        card: '#0F1626',
+                        border: '#A7325D',
+                        accent: '#FF75A0'
+                    }
+                },
+                fontFamily: {
+                    sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    mono: ['Fira Code', 'monospace']
+                }
+            }
+        }
+    }
+</script>
+    
+<!-- Custom Burgundy & Charcoal Aesthetic Styling -->
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F19; /* كحلي فحمي داكن ومريح */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #883955; /* برغندي هادئ عند التحويم */
+        }
+
+        /* Animated Background Gradients & Effects */
+        .bg-grid-pattern {
+            background-image: radial-gradient(rgba(136, 57, 85, 0.12) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .gold-glow-text {
+            text-shadow: 0 0 15px rgba(136, 57, 85, 0.4), 0 0 30px rgba(136, 57, 85, 0.15);
+        }
+
+        .gold-glow-box {
+            box-shadow: 0 0 25px -5px rgba(136, 57, 85, 0.2), inset 0 0 15px -5px rgba(136, 57, 85, 0.08);
+        }
+
+        .gold-glow-box:hover {
+            box-shadow: 0 0 35px 0px rgba(136, 57, 85, 0.35), inset 0 0 20px -2px rgba(136, 57, 85, 0.15);
+        }
+
+        .cyber-border {
+            border: 1px solid rgba(136, 57, 85, 0.25);
+        }
+
+        .cyber-border:focus-within {
+            border-color: #883955;
+            box-shadow: 0 0 15px rgba(136, 57, 85, 0.25);
+        }
+
+        /* Pulse Ring Animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Sidebar Drawer Transition */
+        .drawer-slide {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-[#070A12] text-slate-100 min-h-screen relative overflow-x-hidden">
+
+<!-- خلفية الموقع الثابتة -->
+
+<div class="fixed inset-0 w-full h-full -z-50 bg-cover bg-center" style="background-image: url('{{ url_for('static', filename='subnet1.png') }}');">
+    <!-- طبقة تغطية أخف (تم تقليل التعتيم لـ 65% عشان الصورة تنطق وتبان بوضوح) -->
+    <div class="absolute inset-0 bg-[#070A12]/65 backdrop-blur-[1px]"></div>
+</div>
+    <!-- باقي محتوى الموقع والكروت والبانر هنا... -->
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="min-h-screen flex flex-col justify-between relative">
+<!-- HEADER BAR (Hidden on Splash) -->
+        <header id="main-header" class="hidden sticky top-0 z-30 bg-cyber-dark/90 backdrop-blur-md border-b border-slate-800/80 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDrawer()" class="p-2.5 text-gold-400 hover:text-white bg-slate-900 border border-gold-500/30 hover:border-gold-500 rounded-xl transition-all duration-300 flex items-center justify-center group" title="Quick Navigation Menu">
+                    <i class="fa-solid fa-bars-staggered text-lg group-hover:scale-110 transition-transform"></i>
+                </button>
+                <div onclick="showDashboard()" class="flex items-center gap-3 cursor-pointer group">
+                    
+                    <!-- اللوجو الخاص بكِ بدل أيقونة الشبكة القديمة -->
+                    <div class="w-10 h-10 rounded-xl bg-cyber-card/80 border border-gold-500/40 flex items-center justify-center shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform overflow-hidden p-1.5">
+                        <img src="{{ url_for('static', filename='logo2.png') }}" alt="Subnetx Logo" class="w-full h-full object-contain">
+                    </div>
+                    
+                    <div>
+                        <!-- اسم الموقع الجديد SUBNETX -->
+                        <h1 class="font-extrabold text-lg tracking-wider text-white flex items-center gap-2">
+                            SUBNET<span class="text-gold-400">X</span> 
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/30">PRO</span>
+                        </h1>
+                        <!-- وصف مختصر ومناسب للمبتدئين -->
+                        <p class="text-xs text-slate-400">Smart IP Subnetting & Network Guide</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+          
+
+        <!-- QUICK ACCESS SIDEBAR DRAWER OVERLAY -->
+        <div id="drawer-overlay" onclick="toggleDrawer()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden transition-opacity opacity-0"></div>
+        
+        <!-- SIDEBAR DRAWER -->
+        <aside id="drawer" class="fixed top-0 left-0 h-full w-80 bg-slate-950 border-r border-gold-500/30 z-50 transform -translate-x-full drawer-slide flex flex-col justify-between p-6 shadow-2xl">
+            <div>
+                <div class="flex items-center justify-between pb-6 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-microchip text-2xl text-gold-400"></i>
+                        <span class="font-bold text-lg tracking-wide text-white">Modules Drawer</span>
+                    </div>
+                    <button onclick="toggleDrawer()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+       <nav class="mt-6 flex flex-col gap-2">
+        <button onclick="switchTab('basic'); toggleDrawer();" class="drawer-btn flex items-center gap-3 p-3.5 px-5 rounded-full border border-transparent text-slate-300 hover:bg-[#070A12] hover:text-[#FF75A0] hover:border-[#A7325D]/40 transition text-left text-sm font-medium">
+            <i class="fa-solid fa-magnifying-glass-chart w-6 text-[#A7325D]"></i> Basic IP Analyzer
+        </button>
+        <button onclick="switchTab('flsm'); toggleDrawer();" class="drawer-btn flex items-center gap-3 p-3.5 px-5 rounded-full border border-transparent text-slate-300 hover:bg-[#070A12] hover:text-[#FF75A0] hover:border-[#A7325D]/40 transition text-left text-sm font-medium">
+            <i class="fa-solid fa-table-cells-large w-6 text-[#A7325D]"></i> FLSM Equal Subnetting
+        </button>
+        <button onclick="switchTab('vlsm'); toggleDrawer();" class="drawer-btn flex items-center gap-3 p-3.5 px-5 rounded-full border border-transparent text-slate-300 hover:bg-[#070A12] hover:text-[#FF75A0] hover:border-[#A7325D]/40 transition text-left text-sm font-medium">
+            <i class="fa-solid fa-sitemap w-6 text-[#A7325D]"></i> VLSM Dynamic Allocator
+        </button>
+        <button onclick="switchTab('reverse'); toggleDrawer();" class="drawer-btn flex items-center gap-3 p-3.5 px-5 rounded-full border border-transparent text-slate-300 hover:bg-[#070A12] hover:text-[#FF75A0] hover:border-[#A7325D]/40 transition text-left text-sm font-medium">
+            <i class="fa-solid fa-shield-halved w-6 text-[#A7325D]"></i> Reverse IP Range Checker
+        </button>
+        <button onclick="switchTab('supernet'); toggleDrawer();" class="drawer-btn flex items-center gap-3 p-3.5 px-5 rounded-full border border-transparent text-slate-300 hover:bg-[#070A12] hover:text-[#FF75A0] hover:border-[#A7325D]/40 transition text-left text-sm font-medium">
+            <i class="fa-solid fa-compress w-6 text-[#A7325D]"></i> Route Summarization
+        </button>
+        <button onclick="switchTab('quiz'); toggleDrawer();" class="drawer-btn flex items-center gap-3 p-3.5 px-5 rounded-full border border-transparent text-slate-300 hover:bg-[#070A12] hover:text-[#FF75A0] hover:border-[#A7325D]/40 transition text-left text-sm font-medium">
+            <i class="fa-solid fa-graduation-cap w-6 text-[#A7325D]"></i> Interactive Practice Quiz
+        </button>
+    </nav>
+            </div>
+
+            <div class="pt-6 border-t border-slate-800">
+              <button onclick="showDashboard(); toggleDrawer();" class="w-full py-3 px-6 rounded-full bg-gradient-to-r from-[#A7325D] to-[#7E2245] text-white font-medium shadow-lg hover:shadow-[0_0_20px_rgba(167,50,93,0.4)] transition-all">
+    <i class="fa-solid fa-house"></i> Home Dashboard
+</button>
+            </div>
+        </aside>
+
+        <!-- MAIN DYNAMIC CONTENT CONTAINER -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 relative">
+
+       <!-- 1. SPLASH / WELCOME SCREEN -->
+<section id="screen-splash" class="min-h-[80vh] flex flex-col items-center justify-center text-center py-12 px-4 relative z-10">
+    
+    <!-- اللوجو الخاص بكِ -->
+    <div class="relative mb-8">
+        <div class="w-28 h-28 md:w-36 md:h-36 rounded-3xl bg-cyber-card/80 border-2 border-gold-500 flex items-center justify-center shadow-2xl backdrop-blur-md gold-glow-box animate-float overflow-hidden p-3">
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Subnetx Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="absolute inset-0 rounded-3xl border border-gold-400/40 animate-pulse-ring -m-2 pointer-events-none"></div>
+    </div>
+
+  
+
+    <!-- اسم الموقع الجديد SUBNETX -->
+    <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-4 max-w-3xl">
+        SUBNETI<span class="text-gold-400">X</span>
+    </h1>
+    
+    <!-- الوصف المبسط والمناسب للمبتدئين -->
+    <p class="text-slate-300 text-sm md:text-base max-w-xl mb-10 leading-relaxed font-normal">
+        Your ultimate smart guide to easily calculate network IP ranges, subnet masks, and manage your network effortlessly.
+    </p>
+
+    <!-- زر بيضاوي بالكامل (Rounded-full) -->
+    <button onclick="launchEngine()" class="group relative px-10 py-4 rounded-full bg-gradient-to-r from-gold-400 via-amber-500 to-amber-600 text-slate-950 font-extrabold text-base tracking-wider shadow-xl shadow-gold-500/25 hover:shadow-gold-500/50 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3">
+        <span>LAUNCH SUBNET ENGINE</span>
+        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+    </button>
+</section>
+
+            <!-- 2. MAIN DASHBOARD / MODULE SELECTOR GRID -->
+            <section id="screen-dashboard" class="hidden transition-all duration-500 space-y-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-wide flex items-center gap-3">
+                            <i class="fa-solid fa-cubes text-gold-400"></i> Network Workstation Modules
+                        </h2>
+                        <p class="text-slate-400 text-sm mt-1">Select a workstation module below to perform specialized networking operations.</p>
+                    </div>
+                </div>
+
+                
+                <!-- 6 MODULE CARDS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                  <!-- Module 1 - انحناء يدوي بيضاوي مخصص -->
+<div onclick="switchTab('basic')" class="group cursor-pointer bg-[#0F1626]/80 backdrop-blur-xl border border-[#A7325D]/30 hover:border-[#A7325D] rounded-[3.5rem_1.5rem_3.5rem_1.5rem] p-7 transition-all duration-300 hover:shadow-[0_0_35px_rgba(167,50,93,0.25)] hover:-translate-y-1.5 flex flex-col justify-between relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-28 h-28 bg-[#A7325D]/10 rounded-bl-[4rem] pointer-events-none group-hover:scale-110 transition-transform"></div>
+    <div>
+        <div class="w-14 h-14 rounded-full bg-[#A7325D]/20 border border-[#A7325D]/40 flex items-center justify-center text-[#FF75A0] text-2xl mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#FF75A0] transition-colors">1. Basic IP Analyzer</h3>
+        <p class="text-slate-400 text-sm leading-relaxed mb-6">Detailed IP address decomposition, full binary representation, subnet masks, class type, and usable host count.</p>
+    </div>
+    <div class="flex items-center text-xs font-bold text-[#FF75A0] group-hover:translate-x-1 transition-transform">
+        OPEN MODULE <i class="fa-solid fa-chevron-right ml-2"></i>
+    </div>
+</div>
+
+                 <!-- Module 2 - انحناء يدوي بيضاوي مخصص -->
+<div onclick="switchTab('flsm')" class="group cursor-pointer bg-[#0F1626]/80 backdrop-blur-xl border border-[#A7325D]/30 hover:border-[#A7325D] rounded-[3.5rem_1.5rem_3.5rem_1.5rem] p-7 transition-all duration-300 hover:shadow-[0_0_35px_rgba(167,50,93,0.25)] hover:-translate-y-1.5 flex flex-col justify-between relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-28 h-28 bg-[#A7325D]/10 rounded-bl-[4rem] pointer-events-none group-hover:scale-110 transition-transform"></div>
+    <div>
+        <div class="w-14 h-14 rounded-full bg-[#A7325D]/20 border border-[#A7325D]/40 flex items-center justify-center text-[#FF75A0] text-2xl mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-table-cells-large"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#FF75A0] transition-colors">2. FLSM Equal Subnetting</h3>
+        <p class="text-slate-400 text-sm leading-relaxed mb-6">Fixed Length Subnet Masking. Divide a block into equal-sized subnets based on required subnets or host counts.</p>
+    </div>
+    <div class="flex items-center text-xs font-bold text-[#FF75A0] group-hover:translate-x-1 transition-transform">
+        OPEN MODULE <i class="fa-solid fa-chevron-right ml-2"></i>
+    </div>
+</div>
+<!-- Module 3 -->
+    <div onclick="switchTab('vlsm')" class="group cursor-pointer bg-[#0F1626]/80 backdrop-blur-xl border border-[#A7325D]/30 hover:border-[#A7325D] rounded-[3.5rem_1.5rem_3.5rem_1.5rem] p-7 transition-all duration-300 hover:shadow-[0_0_35px_rgba(167,50,93,0.25)] hover:-translate-y-1.5 flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-28 h-28 bg-[#A7325D]/10 rounded-bl-[4rem] pointer-events-none group-hover:scale-110 transition-transform"></div>
+        <div>
+            <div class="w-14 h-14 rounded-full bg-[#A7325D]/20 border border-[#A7325D]/40 flex items-center justify-center text-[#FF75A0] text-2xl mb-5 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-sitemap"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#FF75A0] transition-colors">3. VLSM Dynamic Allocator</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">Variable Length Subnet Masking. Allocate custom departments with zero IP waste and auto-sorting by capacity.</p>
+        </div>
+        <div class="flex items-center text-xs font-bold text-[#FF75A0] group-hover:translate-x-1 transition-transform">
+            OPEN MODULE <i class="fa-solid fa-chevron-right ml-2"></i>
+        </div>
+    </div>
+
+    <!-- Module 4 -->
+    <div onclick="switchTab('reverse')" class="group cursor-pointer bg-[#0F1626]/80 backdrop-blur-xl border border-[#A7325D]/30 hover:border-[#A7325D] rounded-[3.5rem_1.5rem_3.5rem_1.5rem] p-7 transition-all duration-300 hover:shadow-[0_0_35px_rgba(167,50,93,0.25)] hover:-translate-y-1.5 flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-28 h-28 bg-[#A7325D]/10 rounded-bl-[4rem] pointer-events-none group-hover:scale-110 transition-transform"></div>
+        <div>
+            <div class="w-14 h-14 rounded-full bg-[#A7325D]/20 border border-[#A7325D]/40 flex items-center justify-center text-[#FF75A0] text-2xl mb-5 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#FF75A0] transition-colors">4. Reverse Range Checker</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">Determine if a specific host IP address belongs to a target subnet using Bitwise AND verification.</p>
+        </div>
+        <div class="flex items-center text-xs font-bold text-[#FF75A0] group-hover:translate-x-1 transition-transform">
+            OPEN MODULE <i class="fa-solid fa-chevron-right ml-2"></i>
+        </div>
+    </div>
+
+                   <!-- Module 5 -->
+    <div onclick="switchTab('supernet')" class="group cursor-pointer bg-[#0F1626]/80 backdrop-blur-xl border border-[#A7325D]/30 hover:border-[#A7325D] rounded-[3.5rem_1.5rem_3.5rem_1.5rem] p-7 transition-all duration-300 hover:shadow-[0_0_35px_rgba(167,50,93,0.25)] hover:-translate-y-1.5 flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-28 h-28 bg-[#A7325D]/10 rounded-bl-[4rem] pointer-events-none group-hover:scale-110 transition-transform"></div>
+        <div>
+            <div class="w-14 h-14 rounded-full bg-[#A7325D]/20 border border-[#A7325D]/40 flex items-center justify-center text-[#FF75A0] text-2xl mb-5 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-compress"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#FF75A0] transition-colors">5. Route Summarization</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">Combine multiple contiguous networks into a single summary route and extract ACL Wildcard masks.</p>
+        </div>
+        <div class="flex items-center text-xs font-bold text-[#FF75A0] group-hover:translate-x-1 transition-transform">
+            OPEN MODULE <i class="fa-solid fa-chevron-right ml-2"></i>
+        </div>
+    </div>
+
+    <!-- Module 6 -->
+    <div onclick="switchTab('quiz')" class="group cursor-pointer bg-[#0F1626]/80 backdrop-blur-xl border border-[#A7325D]/30 hover:border-[#A7325D] rounded-[3.5rem_1.5rem_3.5rem_1.5rem] p-7 transition-all duration-300 hover:shadow-[0_0_35px_rgba(167,50,93,0.25)] hover:-translate-y-1.5 flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-28 h-28 bg-[#A7325D]/10 rounded-bl-[4rem] pointer-events-none group-hover:scale-110 transition-transform"></div>
+        <div>
+            <div class="w-14 h-14 rounded-full bg-[#A7325D]/20 border border-[#A7325D]/40 flex items-center justify-center text-[#FF75A0] text-2xl mb-5 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#FF75A0] transition-colors">6. Interactive Subnet Quiz</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">Test your networking mastery across multiple difficulty tiers from Beginner to Advanced scenarios.</p>
+        </div>
+        <div class="flex items-center text-xs font-bold text-[#FF75A0] group-hover:translate-x-1 transition-transform">
+            OPEN MODULE <i class="fa-solid fa-chevron-right ml-2"></i>
+        </div>
+    </div>
+
+                </div>
+            </section>
+
+            <!-- 3. WORKSTATION VIEWS CONTAINER -->
+            <section id="screen-workstation" class="hidden transition-all duration-500 space-y-6">
+                
+                <!-- Workstation Sub-Header -->
+                <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+                    <div class="flex items-center gap-4">
+                        <button onclick="showDashboard()" class="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition" title="Back to Dashboard">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <h2 id="ws-title" class="text-xl font-extrabold text-white">Module Workstation</h2>
+                            <p id="ws-desc" class="text-xs text-slate-400">Select options and parameters to compute outputs.</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleDrawer()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-bold hover:bg-gold-500/20 transition">
+                        <i class="fa-solid fa-list-ul"></i> Switch Module
+                    </button>
+                </div>
+
+                <!-- MODULE 1 VIEW: BASIC -->
+                <div id="view-basic" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-gold-400"></i> IPv4 Address Parameters
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Target IP Address</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <input type="text" id="basic-ip" placeholder="e.g. 192.168.1.50" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Subnet Mask / CIDR</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <input type="text" id="basic-mask" placeholder="e.g. /24 or 255.255.255.0" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="solveBasic()" class="mt-5 w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> Analyze IP Address
+                        </button>
+                    </div>
+                    <div id="basic-results" class="space-y-4"></div>
+                </div>
+
+                <!-- MODULE 2 VIEW: FLSM -->
+                <div id="view-flsm" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-gold-400"></i> FLSM Configuration
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Base Network Address</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <input type="text" id="flsm-ip" placeholder="e.g. 192.168.1.0/24" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Split By</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <select id="flsm-type" onchange="toggleFlsmInput()" class="w-full bg-slate-950 px-3 py-2 text-white font-sans text-sm focus:outline-none">
+                                        <option value="subnets">Number of Subnets Required</option>
+                                        <option value="hosts">Number of Hosts per Subnet</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label id="flsm-count-label" class="block text-xs font-semibold text-slate-400 mb-2">Required Count</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <input type="number" id="flsm-count" placeholder="e.g. 4" min="1" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="solveFLSM()" class="mt-5 w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-gears"></i> Calculate FLSM Subnets
+                        </button>
+                    </div>
+                    <div id="flsm-results" class="space-y-4"></div>
+                </div>
+
+                <!-- MODULE 3 VIEW: VLSM -->
+                <div id="view-vlsm" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-sitemap text-gold-400"></i> VLSM Base Network & Departments
+                        </h3>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-2">Base Network Address</label>
+                            <div class="cyber-border rounded-xl bg-slate-950 p-1 max-w-md">
+                                <input type="text" id="vlsm-ip" placeholder="e.g. 192.168.1.0/24" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-800">
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-sm font-bold text-slate-300">Departments / Segments Requirements:</h4>
+                                <button onclick="addDeptRow()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-gold-400 text-xs font-bold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-plus"></i> Add Department
+                                </button>
+                            </div>
+
+                            <div id="departments-list" class="space-y-3">
+                                <div class="dept-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                                    <div class="md:col-span-6 cyber-border rounded-xl bg-slate-950 p-1">
+                                        <input type="text" class="dept-name w-full bg-transparent px-3 py-1.5 text-white text-sm focus:outline-none placeholder-slate-600" placeholder="Department Name (e.g. HR)">
+                                    </div>
+                                    <div class="md:col-span-5 cyber-border rounded-xl bg-slate-950 p-1">
+                                        <input type="number" class="dept-hosts w-full bg-transparent px-3 py-1.5 text-white font-mono text-sm focus:outline-none placeholder-slate-600" placeholder="Hosts Needed (e.g. 50)">
+                                    </div>
+                                    <div class="md:col-span-1 flex justify-end">
+                                        <button onclick="removeDeptRow(this)" class="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition w-full md:w-auto">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="solveVLSM()" class="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> Generate VLSM Allocation
+                        </button>
+                    </div>
+                    <div id="vlsm-results" class="space-y-4"></div>
+                </div>
+
+                <!-- MODULE 4 VIEW: REVERSE CHECKER -->
+                <div id="view-reverse" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-gold-400"></i> Host Belonging Verification
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Target Host IP</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <input type="text" id="rev-target-ip" placeholder="e.g. 172.16.5.45" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Assumed Network (CIDR)</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <input type="text" id="rev-net-ip" placeholder="e.g. 172.16.4.0/22" class="w-full bg-transparent px-3 py-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600">
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="solveReverse()" class="mt-5 w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check-double"></i> Verify Range Membership
+                        </button>
+                    </div>
+                    <div id="reverse-results" class="space-y-4"></div>
+                </div>
+
+                <!-- MODULE 5 VIEW: SUPERNETTING -->
+                <div id="view-supernet" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-compress text-gold-400"></i> Contiguous Routes List
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Networks List (One network CIDR per line)</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-2">
+                                    <textarea id="supernet-ips" rows="5" placeholder="e.g.&#10;192.168.0.0/24&#10;192.168.1.0/24&#10;192.168.2.0/24&#10;192.168.3.0/24" class="w-full bg-transparent p-2 text-white font-mono text-sm focus:outline-none placeholder-slate-600 resize-none"></textarea>
+                                </div>
+                            </div>
+                            <button onclick="solveSupernet()" class="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-layer-group"></i> Calculate Summary Route & Wildcard
+                            </button>
+                        </div>
+                    </div>
+                    <div id="supernet-results" class="space-y-4"></div>
+                </div>
+
+                <!-- MODULE 6 VIEW: QUIZ -->
+                <div id="view-quiz" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-gold-400"></i> Interactive Practice Simulator
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-400 mb-2">Difficulty Tier</label>
+                                <div class="cyber-border rounded-xl bg-slate-950 p-1">
+                                    <select id="quiz-level" class="w-full bg-slate-950 px-3 py-2 text-white font-sans text-sm focus:outline-none">
+                                        <option value="easy">Beginner (Classes & Default Masks)</option>
+                                        <option value="medium">Intermediate (FLSM & Host Ranges)</option>
+                                        <option value="hard">Advanced (VLSM & Mask Calculation)</option>
+                                        <option value="expert">Expert (Reverse Range & Summarization)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="generateQuiz()" class="px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-dice"></i> Generate Scenario
+                            </button>
+                        </div>
+                    </div>
+                    <div id="quiz-container" class="space-y-4"></div>
+                </div>
+                
+
+            </section>
+
+        </main>
+
+      <footer class="w-full py-4 px-6 border-t border-cyber-border/30 bg-cyber-dark/40 backdrop-blur-md flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+    <div>
+        <span class="font-bold text-gold-400">Subnetix</span> &copy; 2026. All Rights Reserved.
+    </div>
+    <div class="text-slate-300">
+        Designed & Developed by <span class="text-gold-400 font-semibold">Eng. Shahd Alshishiny</span>
+    </div>
+</footer>
+
+    </div>
+
+    <!-- JAVASCRIPT ENGINE & LOGIC -->
+   <script>
+    // Navigation
+    function launchEngine() {
+        document.getElementById('screen-splash').classList.add('hidden');
+        document.getElementById('main-header').classList.remove('hidden');
+        document.getElementById('screen-dashboard').classList.remove('hidden');
+    }
+
+    function showDashboard() {
+        document.getElementById('screen-dashboard').classList.remove('hidden');
+        document.getElementById('screen-workstation').classList.add('hidden');
+    }
+
+    const tabTitles = {
+        'basic': { title: '1. Basic IP Analyzer', desc: 'Decompose IPv4 address into binary, class, network, broadcast, and host capacity.' },
+        'flsm': { title: '2. FLSM Equal Subnetting', desc: 'Divide base network into uniform subnets based on count or host requirements.' },
+        'vlsm': { title: '3. VLSM Dynamic Allocator', desc: 'Custom variable-length subnet allocation sorted by hosts with zero waste.' },
+        'reverse': { title: '4. Reverse Range Checker', desc: 'Verify if a target IP belongs to a given CIDR network range.' },
+        'supernet': { title: '5. Route Summarization', desc: 'Aggregate contiguous subnets into a summary route and extract ACL wildcard masks.' },
+        'quiz': { title: '6. Interactive Subnet Quiz', desc: 'Test networking knowledge with dynamic exam questions across multiple tiers.' }
+    };
+
+    function switchTab(tabKey) {
+        document.getElementById('screen-dashboard').classList.add('hidden');
+        document.getElementById('screen-workstation').classList.remove('hidden');
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.add('hidden'));
+        const targetView = document.getElementById(`view-${tabKey}`);
+        if (targetView) targetView.classList.remove('hidden');
+        if (tabTitles[tabKey]) {
+            document.getElementById('ws-title').textContent = tabTitles[tabKey].title;
+            document.getElementById('ws-desc').textContent = tabTitles[tabKey].desc;
+        }
+    }
+
+    function toggleDrawer() {
+        const drawer = document.getElementById('drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        const isHidden = drawer.classList.contains('-translate-x-full');
+        if (isHidden) {
+            drawer.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        } else {
+            drawer.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+    }
+
+    function addDeptRow() {
+        const list = document.getElementById('departments-list');
+        const row = document.createElement('div');
+        row.className = 'dept-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center';
+        row.innerHTML = `
+            <div class="md:col-span-6 cyber-border rounded-xl bg-slate-950 p-1">
+                <input type="text" class="dept-name w-full bg-transparent px-3 py-1.5 text-white text-sm focus:outline-none placeholder-slate-600" placeholder="Department Name">
+            </div>
+            <div class="md:col-span-5 cyber-border rounded-xl bg-slate-950 p-1">
+                <input type="number" class="dept-hosts w-full bg-transparent px-3 py-1.5 text-white font-mono text-sm focus:outline-none placeholder-slate-600" placeholder="Hosts Needed">
+            </div>
+            <div class="md:col-span-1 flex justify-end">
+                <button onclick="removeDeptRow(this)" class="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition w-full md:w-auto">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+        `;
+        list.appendChild(row);
+    }
+
+    function removeDeptRow(btn) {
+        const list = document.getElementById('departments-list');
+        if (list.children.length > 1) {
+            btn.closest('.dept-row').remove();
+        } else {
+            alert('At least one department entry is required.');
+        }
+    }
+
+    function toggleFlsmInput() {
+        const type = document.getElementById('flsm-type').value;
+        const label = document.getElementById('flsm-count-label');
+        label.textContent = (type === 'subnets') ? 'Subnets Required:' : 'Hosts per Subnet Required:';
+    }
+
+    // --- REAL PYTHON BACKEND CALLS (FETCH) ---
+    async function solveBasic() {
+        const ip = document.getElementById('basic-ip').value.trim() || '192.168.1.50';
+        const mask = document.getElementById('basic-mask').value.trim() || '/24';
+        const container = document.getElementById('basic-results');
+
+        container.innerHTML = `<div class="text-gold-400 text-sm font-mono animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Analyzing IP with Python Backend...</div>`;
+
+        try {
+            const response = await fetch('/api/analyze-basic', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip, mask })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-gold-500/30 rounded-2xl p-6 space-y-4 gold-glow-box">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h4 class="font-bold text-gold-400 flex items-center gap-2">
+                                <i class="fa-solid fa-square-poll-vertical"></i> Analysis Result for ${data.ip} (${data.cidr})
+                            </h4>
+                            <span class="text-xs font-mono px-2 py-1 rounded bg-slate-800 text-slate-300">${data.ip_class} | ${data.is_private ? 'Private IP' : 'Public IP'}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Network ID:</span> <span class="font-mono text-white">${data.network_id}</span></div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Subnet Mask:</span> <span class="font-mono text-white">${data.netmask}</span></div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Usable Host Range:</span> <span class="font-mono text-white">${data.first_usable} - ${data.last_usable}</span></div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Broadcast Address:</span> <span class="font-mono text-white">${data.broadcast_address}</span></div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Total Usable Hosts:</span> <span class="font-mono text-gold-400 font-bold">${data.usable_hosts}</span></div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Total Block Capacity:</span> <span class="font-mono text-slate-300">${data.total_hosts}</span></div>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto">
+                            <span class="text-slate-500 block mb-1">Binary Format:</span>
+                            <span class="text-gold-400 font-bold">${data.binary_format}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">${data.message}</div>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">Failed to communicate with Python Backend.</div>`;
+        }
+    }
+
+    async function solveFLSM() {
+        const ip = document.getElementById('flsm-ip').value.trim() || '192.168.1.0/24';
+        const type = document.getElementById('flsm-type').value;
+        const count = parseInt(document.getElementById('flsm-count').value) || 4;
+        const container = document.getElementById('flsm-results');
+
+        container.innerHTML = `<div class="text-gold-400 text-sm font-mono animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Computing FLSM with Python...</div>`;
+
+        try {
+            const response = await fetch('/api/solve-flsm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip, type, count })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                let rowsHtml = data.subnets.map(sub => `
+                    <tr class="hover:bg-slate-800/30">
+                        <td class="p-3 font-sans text-white font-bold">Subnet #${sub.id}</td>
+                        <td class="p-3 text-gold-400 font-bold">${sub.network_id} ${sub.cidr}</td>
+                        <td class="p-3">${sub.first_usable} - ${sub.last_usable}</td>
+                        <td class="p-3">${sub.broadcast}</td>
+                        <td class="p-3 text-slate-300">${sub.usable_hosts}</td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-gold-500/30 rounded-2xl p-6 space-y-4 gold-glow-box">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h4 class="font-bold text-gold-400 flex items-center gap-2">
+                                <i class="fa-solid fa-table"></i> FLSM Subnet Table for ${data.base_network}
+                            </h4>
+                            <span class="text-xs font-mono px-2 py-1 rounded bg-slate-800 text-slate-300">New Mask: ${data.new_netmask}</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead class="bg-slate-950 text-gold-400 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3 font-sans">Subnet</th>
+                                        <th class="p-3">Network ID</th>
+                                        <th class="p-3">Usable Range</th>
+                                        <th class="p-3">Broadcast Address</th>
+                                        <th class="p-3">Capacity</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">${data.message}</div>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">Failed to communicate with Python Backend.</div>`;
+        }
+    }
+
+    async function solveVLSM() {
+        const base_ip = document.getElementById('vlsm-ip').value.trim() || '192.168.1.0/24';
+        const deptRows = document.querySelectorAll('#departments-list .dept-row');
+        const departments = [];
+
+        deptRows.forEach(row => {
+            const name = row.querySelector('.dept-name').value.trim() || 'Department';
+            const hosts = parseInt(row.querySelector('.dept-hosts').value) || 10;
+            departments.push({ name, hosts });
+        });
+
+        const container = document.getElementById('vlsm-results');
+        container.innerHTML = `<div class="text-gold-400 text-sm font-mono animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Calculating VLSM with Python...</div>`;
+
+        try {
+            const response = await fetch('/api/solve-vlsm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ base_ip, departments })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                let rowsHtml = data.allocations.map(alloc => `
+                    <tr class="hover:bg-slate-800/30">
+                        <td class="p-3 font-sans text-white font-bold">${alloc.department}</td>
+                        <td class="p-3 text-slate-300">${alloc.hosts_requested}</td>
+                        <td class="p-3 text-gold-400 font-bold">${alloc.cidr} (${alloc.allocated_hosts} hosts)</td>
+                        <td class="p-3 font-bold text-white">${alloc.network_id}</td>
+                        <td class="p-3">${alloc.first_usable} - ${alloc.last_usable}</td>
+                        <td class="p-3 text-slate-400">${alloc.broadcast}</td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-gold-500/30 rounded-2xl p-6 space-y-4 gold-glow-box">
+                        <h4 class="font-bold text-gold-400 flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <i class="fa-solid fa-sitemap"></i> Optimal VLSM Allocation Result for ${data.base_network}
+                        </h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead class="bg-slate-950 text-gold-400 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3 font-sans">Department</th>
+                                        <th class="p-3">Req. Hosts</th>
+                                        <th class="p-3">CIDR Mask</th>
+                                        <th class="p-3">Assigned Subnet</th>
+                                        <th class="p-3">Usable Range</th>
+                                        <th class="p-3">Broadcast</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">${data.message}</div>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">Failed to communicate with Python Backend.</div>`;
+        }
+    }
+
+    async function solveReverse() {
+        const target_ip = document.getElementById('rev-target-ip').value.trim() || '172.16.5.45';
+        const net_ip = document.getElementById('rev-net-ip').value.trim() || '172.16.4.0/22';
+        const container = document.getElementById('reverse-results');
+
+        container.innerHTML = `<div class="text-gold-400 text-sm font-mono animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Verifying Host Membership...</div>`;
+
+        try {
+            const response = await fetch('/api/solve-reverse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target_ip, net_ip })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const isMatch = data.belongs;
+                container.innerHTML = `
+                    <div class="bg-slate-900 border ${isMatch ? 'border-emerald-500/50' : 'border-red-500/50'} rounded-2xl p-6 space-y-3">
+                        <div class="flex items-center gap-3 ${isMatch ? 'text-emerald-400' : 'text-red-400'} font-bold text-base">
+                            <i class="fa-solid ${isMatch ? 'fa-circle-check' : 'fa-circle-xmark'} text-2xl"></i>
+                            ${isMatch ? 'Match Verified: Host belongs to subnet range!' : 'No Match: Host is outside this subnet range!'}
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono mt-3">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block">Target Host IP:</span> ${data.target_ip}</div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block">Subnet Range:</span> ${data.network}</div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block">Host Position:</span> ${data.host_position}</div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block">Broadcast Address:</span> ${data.broadcast}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">${data.message}</div>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">Failed to communicate with Python Backend.</div>`;
+        }
+    }
+
+    async function solveSupernet() {
+        const ips = document.getElementById('supernet-ips').value;
+        const container = document.getElementById('supernet-results');
+
+        container.innerHTML = `<div class="text-gold-400 text-sm font-mono animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Summarizing Routes with Python...</div>`;
+
+        try {
+            const response = await fetch('/api/solve-supernet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ips })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-gold-500/30 rounded-2xl p-6 space-y-3 gold-glow-box">
+                        <h4 class="font-bold text-gold-400 flex items-center gap-2">
+                            <i class="fa-solid fa-compress"></i> Route Summarization & ACL Wildcard Mask
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-mono mt-2">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">Aggregated Summary Route:</span> <span class="text-gold-400 font-bold">${data.summary_route}</span></div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-slate-500 block text-xs">ACL Wildcard Mask:</span> <span class="text-white font-bold">${data.wildcard_mask}</span></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">${data.message}</div>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">Failed to communicate with Python Backend.</div>`;
+        }
+    }
+
+    let currentQuizAns = '';
+
+    async function generateQuiz() {
+        const level = document.getElementById('quiz-level').value;
+        const container = document.getElementById('quiz-container');
+
+        container.innerHTML = `<div class="text-gold-400 text-sm font-mono animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Generating Exam Scenario...</div>`;
+
+        try {
+            const response = await fetch('/api/generate-quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ level })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                currentQuizAns = data.question.ans;
+                const optionsHtml = data.question.options.map(opt => `
+                    <button onclick="checkAnswer('${opt}', this)" class="w-full text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-sm font-mono transition">
+                        ${opt}
+                    </button>
+                `).join('');
+
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-gold-500/30 rounded-2xl p-6 space-y-4 gold-glow-box">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h4 class="font-bold text-gold-400 flex items-center gap-2">
+                                <i class="fa-solid fa-circle-question"></i> Subnet Exam Scenario (${data.level.toUpperCase()})
+                            </h4>
+                        </div>
+                        <p class="text-sm text-white font-semibold">${data.question.q}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                            ${optionsHtml}
+                        </div>
+                        <div id="quiz-feedback" class="mt-3"></div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">Failed to generate quiz.</div>`;
+        }
+    }
+
+    function checkAnswer(selected, btn) {
+        const feedback = document.getElementById('quiz-feedback');
+        if (selected === currentQuizAns) {
+            btn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-400');
+            feedback.innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">✔ Excellent! Correct Answer.</div>`;
+        } else {
+            btn.classList.add('bg-red-500/20', 'border-red-500', 'text-red-400');
+            feedback.innerHTML = `<div class="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold">❌ Incorrect! The correct answer is: ${currentQuizAns}</div>`;
+        }
+    }
+</script>
+</body>
+</html>
